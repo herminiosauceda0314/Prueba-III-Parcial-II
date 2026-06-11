@@ -213,7 +213,37 @@ public class EmpleadoManager {
         }
     }
     
-    
-    
+    public void printEmployee(int code) throws IOException{
+        if(isEmployeeActive(code)){
+            String name=remps.readUTF();
+            double salary=remps.readDouble();
+            Date dateH=new Date(remps.readLong());
+            
+            System.out.println("Codigo: "+code);
+            System.out.println("Nombre: "+name);
+            System.out.println("Salario: "+salary);
+            System.out.println("Fecha de Contratacion: "+dateH);
+            
+            double totalAnual=0;
+            try(RandomAccessFile sales=salesFilefor(code)){
+                for(int mes=0; mes < 12; mes++){
+                    double ventasMes=sales.readDouble();
+                    sales.readBoolean();
+                    System.out.println("Mes " + (mes+1) + " : "+ventasMes);
+                    totalAnual +=ventasMes;
+                }
+            }
+            System.out.println("Total de ventas del año: "+totalAnual);
+            
+            int contadorRecibos=0;
+                try(RandomAccessFile bills=billsFilefor(code)){
+                    contadorRecibos=(int)(bills.length()/32);
+                }
+                System.out.println("Total de pagos realizados: "+contadorRecibos);
 
+            } else {
+                System.out.println("Empleado no existe o esta inactivo.");
+        }
+    }
 }
+   
