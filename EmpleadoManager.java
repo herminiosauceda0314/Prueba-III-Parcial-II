@@ -166,6 +166,54 @@ public class EmpleadoManager {
         return new RandomAccessFile(path, "rw");
     }
     
+    public boolean isEmployeePayed(int code) throws IOException{
+        try(RandomAccessFile sales=salesFilefor(code)){
+            int mes=Calendar.getInstance().get(Calendar.MONTH);
+            
+            sales.seek((mes*9)+8);
+            return sales.readBoolean();
+        }
+    }
+    
+    public void payEmployee(int code) throws IOException{
+        if(isEmployeeActive(code) && !isEmployeePayed(code)){
+            int mes=Calendar.getInstance().get(Calendar.MONTH);
+            int año=Calendar.getInstance().get(Calendar.YEAR);
+            
+            double ventas=0;
+            try(RandomAccessFile sales=salesFilefor(code)){
+                sales.seek(mes*9);
+                ventas=sales.readDouble();
+            }
+            
+            String name=remps.readUTF();
+            double salarioBase=remps.readDouble();
+            
+            double sueldo=salarioBase+(ventas*0.10);
+            double deduccion=sueldo*0.035;
+            double total=sueldo-deduccion;
+            
+            try(RandomAccessFile bills = billsFilefor(code)){
+                bills.seek(bills.length());
+                bills.writeLong(new Date().getTime());
+                bills.writeDouble(sueldo);
+                bills.writeDouble(deduccion);
+                bills.writeInt(año);
+                bills.writeInt(mes);
+            }
+            
+            try(RandomAccessFile sales=salesFilefor(code)){
+                sales.seek((mes*9)+8);
+                sales.writeBoolean(true);
+            }
+            
+            System.out.println("Empleado ["+name+"] se le pago Lps. ["+total+"]");
+        }else{
+            System.out.println("No se pudo pagar.");
+        }
+    }
+    
+    
     
 
 }
