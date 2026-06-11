@@ -36,7 +36,6 @@ public class EmpleadoManager {
         mf.mkdir();
         
         try {  
-            // CORRECCIÓN: Se cambiaron las comillas simples por dobles
             rcods = new RandomAccessFile("company/codigo.emp", "rw");
             remps = new RandomAccessFile("company/empleado.emp", "rw");
             
@@ -145,6 +144,20 @@ public class EmpleadoManager {
             return true;
         }
         return false;
+    }
+    
+    public void addSaleToEmployee(int code, double ven) throws IOException{
+        if(isEmployeeActive(code)){
+            RandomAccessFile sales=salesFilefor(code);
+            
+            int pos=Calendar.getInstance().get(Calendar.MONTH)*9;
+            sales.seek(pos);
+            
+            double monto = sales.readDouble();
+            sales.seek(pos);
+            sales.writeDouble(monto+ven);
+            sales.close();
+        }
     }
 
 }
