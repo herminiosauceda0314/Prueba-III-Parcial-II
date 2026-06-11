@@ -38,6 +38,7 @@ public class EmpleadoManager {
         try {  
             rcods = new RandomAccessFile("company/codigo.emp", "rw");
             remps = new RandomAccessFile("company/empleado.emp", "rw");
+            initCodes();
             
         } catch (IOException e) {
             System.out.println("Error al inicializar los archivos: " + e.getMessage());
@@ -69,7 +70,7 @@ public class EmpleadoManager {
         remps.writeDouble(salary);
         remps.writeLong(Calendar.getInstance().getTimeInMillis());
         remps.writeLong(0);
-        //Crear folder
+        createEmployeeFolder(code);
     }
     
     private String employeeFolder(int code){
@@ -114,8 +115,8 @@ public class EmpleadoManager {
             double sal=remps.readDouble();
             Date fecha=new Date(remps.readLong());
             if(remps.readLong()==0){
-                System.out.println(code+"-"+name+"-"+" - Lps. "+sal+
-                        "Contratado el: "+fecha);
+                System.out.println(code+" - "+name+" - "+" - Lps. "+sal+
+                        " Contratado el: "+fecha);
             }
         }
     }
@@ -135,7 +136,7 @@ public class EmpleadoManager {
         return false;
     }
     
-    private boolean fireEmployee(int code) throws IOException{
+    boolean fireEmployee(int code) throws IOException{
         if(isEmployeeActive(code)){
             String name=remps.readUTF();
             remps.skipBytes(16);
